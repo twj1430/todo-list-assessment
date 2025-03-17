@@ -56,7 +56,7 @@ export default function TodoList() {
     // Reset form fields after submission
     setActivity("");
     setPrice(0);
-    setType("education");
+    setType(activityTypes[0]);
     setBookingRequired(false);
     setAccessibility(0.0);
   };
@@ -144,6 +144,8 @@ export default function TodoList() {
           <li key={index} className="list-item">
             <span>
               {task.activity} - RM{task.price} ({task.type})
+              {task.bookingRequired && " | Booking Required"}
+              {` | Accessibility: ${task.accessibility}`}
             </span>
             <button onClick={() => removeTask(index)} className="delete-btn">
               Delete
