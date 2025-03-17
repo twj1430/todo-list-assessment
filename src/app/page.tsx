@@ -1,103 +1,156 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+import "./globals.css";
 
-export default function Home() {
+// List of available activity types
+const activityTypes: string[] = [
+  "Education",
+  "Recreational",
+  "Social",
+  "Diy",
+  "Charity",
+  "Cooking",
+  "Relaxation",
+  "Music",
+  "Busywork",
+];
+
+export default function TodoList() {
+  // State to manage tasks
+  const [tasks, setTasks] = useState<
+    {
+      activity: string;
+      price: number;
+      type: string;
+      bookingRequired: boolean;
+      accessibility: number;
+    }[]
+  >([]);
+
+  // State for form inputs
+  const [activity, setActivity] = useState<string>("");
+  const [price, setPrice] = useState<number>(0);
+  const [type, setType] = useState<string>(activityTypes[0]);
+  const [bookingRequired, setBookingRequired] = useState<boolean>(false);
+  const [accessibility, setAccessibility] = useState<number>(0.0);
+
+  // Load tasks from localStorage on component mount
+  useEffect(() => {
+    const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    if (storedTasks) setTasks(storedTasks);
+  }, []);
+
+  // Save tasks to localStorage whenever tasks change
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
+
+  // Function to handle form submission and add a new task
+  const addTask = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!activity.trim() || price <= 0) return;
+
+    const newTask = { activity, price, type, bookingRequired, accessibility };
+    setTasks([...tasks, newTask]);
+    
+    // Reset form fields after submission
+    setActivity("");
+    setPrice(0);
+    setType("education");
+    setBookingRequired(false);
+    setAccessibility(0.0);
+  };
+
+  // Function to remove a task by index
+  const removeTask = (index: number) => {
+    setTasks(tasks.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="container">
+      <h1 className="title">To-Do List</h1>
+      <p className="summary">Total Activities: {tasks.length}</p>
+      <form onSubmit={addTask} className="form">
+        <div className="form-group">
+          <label htmlFor="activity">Activity:</label>
+          <input
+            type="text"
+            placeholder="Activity"
+            value={activity}
+            onChange={(e) => setActivity(e.target.value)}
+            className="input"
+            required
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="form-group">
+          <label htmlFor="price">Price:</label>
+          <input
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(Number(e.target.value))}
+            className="input"
+            required
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </div>
+        <div className="form-group">
+          <label htmlFor="type">Type:</label>
+          <select
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="input"
+          >
+            {activityTypes.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        {/* Checkbox for Booking Required */}
+        <label className="checkbox-label">
+          <input
+            type="checkbox"
+            checked={bookingRequired}
+            onChange={() => setBookingRequired(!bookingRequired)}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          Booking Required
+        </label>
+        
+        {/* Slider for Accessibility */}
+        <label className="slider-label">
+          Accessibility: {accessibility}
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={accessibility}
+            onChange={(e) => setAccessibility(Number(e.target.value))}
+            className="slider"
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </label>
+        
+        {/* Submit Button */}
+        <button type="submit" className="btn">
+          Add Activity
+        </button>
+      </form>
+
+      {/* Display List of Activities */}
+      <ul className="list">
+        {tasks.map((task, index) => (
+          <li key={index} className="list-item">
+            <span>
+              {task.activity} - RM{task.price} ({task.type})
+            </span>
+            <button onClick={() => removeTask(index)} className="delete-btn">
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
